@@ -1,16 +1,18 @@
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
+from django.db.models import CharField, ManyToManyField
 
-from database.base import Base
 from database.mixins.base import BaseMixin
-# from database.models.permission_role import PermissionRole
+from database.models.role import Role
 
 
-class Permission(Base, BaseMixin):
-
-    name = Column(String, unique=True, nullable=False)
-    description = Column(String)
+class Permission(BaseMixin):
+    name = CharField(unique=True)
+    description = CharField(null=True, blank=True)
 
     # Relation
-    role = relationship("Role", secondary="permission_role", 
-                        back_populates="permission", lazy=True, uselist=False)
+    role = ManyToManyField(Role)
+
+    class Meta:
+        db_table = "permission"
+
+    def __str__(self):
+        return self.name

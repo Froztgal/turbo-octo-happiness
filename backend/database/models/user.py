@@ -1,19 +1,17 @@
-from sqlalchemy import Boolean, Column, String
-from sqlalchemy.orm import relationship
+from django.db.models import BooleanField, CharField
 
-from database.base import Base
 from database.mixins.base import BaseMixin
 
 
-class User(Base, BaseMixin):
+class User(BaseMixin):
+    user_name = CharField(unique=True)
+    email = CharField(unique=True)
+    password_hash = CharField()
+    is_active = BooleanField(default=False)
+    is_superuser = BooleanField(default=False)
 
-    user_name = Column(String, unique=True, nullable=False)
-    email = Column(String, unique=True, nullable=False)
-    password_hash = Column(String, unique=True, nullable=False)
-    is_active = Column(Boolean, nullable=False, default=False)
-    is_superuser = Column(Boolean, nullable=False, default=False)
+    class Meta:
+        db_table = "user"
 
-    # Relation
-    role = relationship(
-        "Role", secondary="user_role", back_populates="user", lazy=True, uselist=False
-    )
+    def __str__(self):
+        return self.user_name

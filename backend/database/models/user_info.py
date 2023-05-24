@@ -1,22 +1,28 @@
-from sqlalchemy import Column, ForeignKey, String
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import column_property, relationship
+from django.db.models import CASCADE, CharField, Model, OneToOneField
 
-from database.base import Base
-from database.mixins.base import BaseMixin
+from .user import User
 
 
-class UserInfo(Base, BaseMixin):
-
-    first_name = Column(String)
-    last_name = Column(String)
-    avatar = Column(String)
-    phone_number = Column(String)
+class UserInfo(Model):
+    first_name = CharField()
+    last_name = CharField()
+    avatar = CharField()
+    phone_number = CharField(unique=True)
 
     # Relation
-    user_id = Column(UUID, ForeignKey("user.id"), nullable=False)
-    user = relationship("User", backref="user_info", 
-                        lazy=True, uselist=False)
+    user = OneToOneField(
+        User,
+        on_delete=CASCADE,
+        primary_key=True,
+    )
 
     # Property
-    fullname = column_property(f"{first_name} {last_name}")
+    @property
+    def fullname(self):
+        return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        db_table = "user_info"
+
+    def __str__(self):
+        return self.fullname

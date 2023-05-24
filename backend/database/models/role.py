@@ -1,19 +1,18 @@
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
+from django.db.models import CASCADE, CharField, ForeignKey
 
-from database.base import Base
 from database.mixins.base import BaseMixin
-from database.models.permission_role import PermissionRole
-from database.models.user_role import UserRole
+from database.models.user import User
 
 
-class Role(Base, BaseMixin):
-
-    name = Column(String, unique=True, nullable=False)
-    description = Column(String)
+class Role(BaseMixin):
+    name = CharField(unique=True)
+    description = CharField(null=True, blank=True)
 
     # Relation
-    user = relationship("User", secondary="user_role", back_populates="role", 
-                        lazy=True, uselist=False)
-    permission = relationship("Permission", secondary="permission_role", 
-                        back_populates="role", lazy=True, uselist=False)
+    user = ForeignKey(User, on_delete=CASCADE)
+
+    class Meta:
+        db_table = "role"
+
+    def __str__(self):
+        return self.name
